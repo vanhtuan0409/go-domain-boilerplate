@@ -4,13 +4,18 @@ import (
 	"errors"
 	"regexp"
 
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 	"github.com/vanhtuan0409/go-domain-boilerplate/domain/common"
 )
 
 type MemberID string
-
 type Email string
+
+var (
+	emailRegex          = `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
+	ErrorDuplicateEmail = errors.New("Duplicate email")
+	ErrorEmailInvalid   = errors.New("Email invalid")
+)
 
 func (e Email) Equal(test Email) bool {
 	return e == test
@@ -20,10 +25,6 @@ func IsEmailValid(email Email) bool {
 	re := regexp.MustCompile(emailRegex)
 	return re.MatchString(string(email))
 }
-
-var emailRegex = `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
-var ErrorDuplicateEmail = errors.New("Duplicate email")
-var ErrorEmailInvalid = errors.New("Email invalid")
 
 type Member struct {
 	common.BaseEntity
