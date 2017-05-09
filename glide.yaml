@@ -1,0 +1,6 @@
+package: github.com/vanhtuan0409/go-domain-boilerplate
+import:
+- package: github.com/stretchr/testify
+  version: v1.1.4
+- package: github.com/satori/go.uuid
+  version: v1.1.0
