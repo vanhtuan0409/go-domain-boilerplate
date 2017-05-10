@@ -11,6 +11,7 @@ import (
 type GoalID string
 
 var (
+	ErrorGoalNotFound     = errors.New("Goal not found")
 	ErrorDuplicateTask    = errors.New("Duplicate task")
 	ErrorInvalidTaskValue = errors.New("Invalid task value")
 	ErrorTaskNotFound     = errors.New("Task not found")

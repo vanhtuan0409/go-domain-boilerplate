@@ -15,6 +15,7 @@ var (
 	emailRegex          = `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
 	ErrorDuplicateEmail = errors.New("Duplicate email")
 	ErrorEmailInvalid   = errors.New("Email invalid")
+	ErrorMemberNotFound = errors.New("Member not found")
 )
 
 func (e Email) Equal(test Email) bool {

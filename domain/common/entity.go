@@ -18,8 +18,5 @@ func (e *BaseEntity) IsContainEvent(eventType string) bool {
 }
 
 func (e *BaseEntity) DeferEvent(evt IDomainEvent) {
-	evtType := evt.GetEventType()
-	if !e.IsContainEvent(evtType) {
-		e.Events = append(e.Events)
-	}
+	e.Events = append(e.Events)
 }
