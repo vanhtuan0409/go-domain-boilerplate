@@ -10,10 +10,10 @@ import (
 type Controller struct {
 	GoalUsecase   IGoalUsecase
 	MemberUsecase IMemberUsecase
-	Mapper        IErrorMapper
+	Mapper        IErrorHandler
 }
 
-func NewController(gu IGoalUsecase, mu IMemberUsecase, mapper IErrorMapper) *Controller {
+func NewController(gu IGoalUsecase, mu IMemberUsecase, mapper IErrorHandler) *Controller {
 	controller := Controller{}
 	controller.GoalUsecase = gu
 	controller.MemberUsecase = mu

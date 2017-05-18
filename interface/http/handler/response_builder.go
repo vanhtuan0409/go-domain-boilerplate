@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-type IErrorMapper interface {
+type IErrorHandler interface {
 	MapHttpCode(err error) int
 	MapContent(err error) interface{}
 }
@@ -14,7 +14,7 @@ type Response struct {
 	httpCode    int
 	content     interface{}
 	err         error
-	errorMapper IErrorMapper
+	errorMapper IErrorHandler
 }
 
 func (r *Response) GetHttpCode() int {
@@ -39,10 +39,10 @@ type Builder struct {
 	httpCode    int
 	content     interface{}
 	err         error
-	errorMapper IErrorMapper
+	errorMapper IErrorHandler
 }
 
-func ReponseBuilder(mapper IErrorMapper) *Builder {
+func ReponseBuilder(mapper IErrorHandler) *Builder {
 	builder := Builder{}
 	builder.errorMapper = mapper
 	return &builder
