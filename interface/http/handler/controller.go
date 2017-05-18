@@ -52,13 +52,7 @@ func (ctrl *Controller) CheckInTask(w http.ResponseWriter, r *http.Request) {
 	goalID := domaingoal.GoalID(vars["goalID"])
 
 	// Parse memberID
-	token := r.Header.Get("Authorization")
-	if len(token) <= 7 {
-		response := ReponseBuilder(ctrl.Mapper).Error(ErrorInvalidToken).Build()
-		SendJSONResponse(response, w)
-		return
-	}
-	memberID := domainmember.MemberID(token[7:])
+	memberID := r.Context().Value("memberID").(domainmember.MemberID)
 
 	// Parse checkin request
 	decoder := json.NewDecoder(r.Body)

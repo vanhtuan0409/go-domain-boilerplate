@@ -13,6 +13,7 @@ import (
 	"github.com/vanhtuan0409/go-domain-boilerplate/application/member"
 	"github.com/vanhtuan0409/go-domain-boilerplate/infrastructure/eventbus"
 	"github.com/vanhtuan0409/go-domain-boilerplate/infrastructure/logger"
+	"github.com/vanhtuan0409/go-domain-boilerplate/infrastructure/tokenprovider"
 	"github.com/vanhtuan0409/go-domain-boilerplate/interface/http/handler"
 	"github.com/vanhtuan0409/go-domain-boilerplate/interface/http/middleware"
 	"github.com/vanhtuan0409/go-domain-boilerplate/interface/repository"
@@ -53,8 +54,11 @@ func main() {
 	server.ListenAndServe()
 }
 
-func InitRoute(ctrl *handler.Controller) *negroni.Negroni {
+func InitRoute(ctrl *handler.Controller) *mux.Router {
+	tokenProvider := tokenprovider.NewTokenProvider()
+
 	loggerMdw := middleware.NewLoggerMiddleware()
+	tokenMdw := middleware.NewTokenMiddleware(tokenProvider)
 	corsMdw := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"},
@@ -64,12 +68,25 @@ func InitRoute(ctrl *handler.Controller) *negroni.Negroni {
 		},
 	})
 	commonMdw := negroni.New(loggerMdw, corsMdw)
+	protectMdw := negroni.New(loggerMdw, corsMdw, tokenMdw)
 
 	r := mux.NewRouter()
-	r.Path("/members").Methods("GET").HandlerFunc(ctrl.ListAllMember)
-	r.Path("/members/{memberID}/goals").Methods("GET").HandlerFunc(ctrl.ListMemberGoal)
-	r.Path("/goals/{goalID}/checkin").Methods("POST").HandlerFunc(ctrl.CheckInTask)
+	r.Path("/members").Methods("GET").Handler(
+		WithHandleFunc(commonMdw, ctrl.ListAllMember),
+	)
+	r.Path("/members/{memberID}/goals").Methods("GET").Handler(
+		WithHandleFunc(commonMdw, ctrl.ListMemberGoal),
+	)
+	r.Path("/goals/{goalID}/checkin").Methods("POST").Handler(
+		WithHandleFunc(protectMdw, ctrl.CheckInTask),
+	)
 
-	commonMdw.UseHandler(r)
-	return commonMdw
+	return r
+}
+
+func WithHandleFunc(mdw *negroni.Negroni, handlerFunc func(rw http.ResponseWriter, r *http.Request)) *negroni.Negroni {
+	handlers := mdw.Handlers()
+	newMdw := negroni.New(handlers...)
+	newMdw.UseHandlerFunc(handlerFunc)
+	return newMdw
 }
