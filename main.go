@@ -2,19 +2,67 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"time"
 
-	"github.com/vanhtuan0409/go-domain-boilerplate/domain/goal"
-	"github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
+	"github.com/gorilla/mux"
+	"github.com/rs/cors"
+	"github.com/urfave/negroni"
+	"github.com/vanhtuan0409/go-domain-boilerplate/application/accesscontrol"
+	"github.com/vanhtuan0409/go-domain-boilerplate/application/goal"
+	"github.com/vanhtuan0409/go-domain-boilerplate/application/member"
+	"github.com/vanhtuan0409/go-domain-boilerplate/infrastructure/eventbus"
+	interfacehttp "github.com/vanhtuan0409/go-domain-boilerplate/interface/http"
+	"github.com/vanhtuan0409/go-domain-boilerplate/interface/repository"
+
+	graceful "gopkg.in/tylerb/graceful.v1"
 )
 
 func main() {
-	shiro := member.NewMember("Shiro")
-	sampleGoal := goal.NewGoal("Goal 1", "Goal 1 Description", shiro)
+	goalRepo := repository.NewInMemGoalRepo()
+	memberRepo := repository.NewInMemMemberRepo()
 
-	sampleGoal.AddTask("Task 1", "", 10, "time")
-	sampleGoal.AddTask("Task 2", "", 50, "unit")
+	accessControlService := accesscontrol.NewAccessControl()
+	dispatcher := eventbus.NewEventDispatcher()
 
-	sampleGoal.CheckIn("Task 1", 5, "This is a sample checkin")
+	goalUsecase := goal.NewGoalUsecase(
+		goalRepo, memberRepo,
+		accessControlService, dispatcher,
+	)
+	memberUsecase := member.NewMemberUsecase(memberRepo)
 
-	fmt.Println(sampleGoal.Progress())
+	controller := interfacehttp.NewController(goalUsecase, memberUsecase)
+
+	routes := InitRoute(controller)
+	server := &graceful.Server{
+		Timeout: 10 * time.Second,
+		Server: &http.Server{
+			Addr:    ":8080",
+			Handler: routes,
+		},
+	}
+
+	fmt.Println("Server deployed at :8080")
+	server.ListenAndServe()
+}
+
+func InitRoute(ctrl *interfacehttp.Controller) *negroni.Negroni {
+	recoveryMdw := negroni.NewRecovery()
+	corsMdw := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"},
+		AllowedHeaders: []string{
+			"Accept", "Content-Type", "Content-Length",
+			"Accept-Encoding", "X-CSRF-Token", "Authorization",
+		},
+	})
+	commonMdw := negroni.New(recoveryMdw, corsMdw)
+
+	r := mux.NewRouter()
+	r.Path("/members").Methods("GET").HandlerFunc(ctrl.ListAllMember)
+	r.Path("/members/{memberID}/goals").Methods("GET").HandlerFunc(ctrl.ListMemberGoal)
+	r.Path("/goals/{goalID}/checkin").Methods("POST").HandlerFunc(ctrl.CheckInTask)
+
+	commonMdw.UseHandler(r)
+	return commonMdw
 }
