@@ -11,28 +11,9 @@ type IErrorHandler interface {
 }
 
 type Response struct {
-	httpCode    int
-	content     interface{}
-	err         error
-	errorMapper IErrorHandler
-}
-
-func (r *Response) GetHttpCode() int {
-	if r.err != nil {
-		return r.errorMapper.MapHttpCode(r.err)
-	}
-	if r.httpCode != 0 {
-		return r.httpCode
-	}
-	return http.StatusOK
-}
-
-func (r *Response) GetJSON() ([]byte, error) {
-	if r.err != nil {
-		errorContent := r.errorMapper.MapContent(r.err)
-		return json.Marshal(errorContent)
-	}
-	return json.Marshal(r.content)
+	HttpCode int
+	Content  interface{}
+	Err      error
 }
 
 type Builder struct {
@@ -65,21 +46,38 @@ func (b *Builder) Error(err error) *Builder {
 
 func (b *Builder) Build() *Response {
 	response := Response{}
-	response.httpCode = b.httpCode
-	response.content = b.content
-	response.err = b.err
-	response.errorMapper = b.errorMapper
+	response.HttpCode = b.getStatusCode()
+	response.Content = b.getContent()
+	response.Err = b.err
 	return &response
 }
 
+func (b *Builder) getStatusCode() int {
+	if b.err != nil {
+		return b.errorMapper.MapHttpCode(b.err)
+	}
+	if b.httpCode != 0 {
+		return b.httpCode
+	}
+	return http.StatusOK
+}
+
+func (b *Builder) getContent() interface{} {
+	if b.err != nil {
+		return b.errorMapper.MapContent(b.err)
+	}
+	return b.content
+}
+
 func SendJSONResponse(res *Response, w http.ResponseWriter) error {
-	js, err := res.GetJSON()
+	js, err := json.Marshal(res.Content)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Internal server error"))
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(res.GetHttpCode())
+	w.WriteHeader(res.HttpCode)
 	w.Write(js)
 	return nil
 }

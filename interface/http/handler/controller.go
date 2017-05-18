@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/gorilla/mux"
 	domaingoal "github.com/vanhtuan0409/go-domain-boilerplate/domain/goal"
 	domainmember "github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
 )
@@ -29,7 +30,8 @@ func (ctrl *Controller) ListAllMember(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ctrl *Controller) ListMemberGoal(w http.ResponseWriter, r *http.Request) {
-	memberID := domainmember.MemberID("1")
+	vars := mux.Vars(r)
+	memberID := domainmember.MemberID(vars["memberID"])
 	goals, err := ctrl.GoalUsecase.GetAllByMember(memberID)
 
 	response := ReponseBuilder(ctrl.Mapper).Content(goals).Error(err).Build()
@@ -37,8 +39,10 @@ func (ctrl *Controller) ListMemberGoal(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ctrl *Controller) CheckInTask(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	goalID := domaingoal.GoalID(vars["goalID"])
+
 	memberID := domainmember.MemberID("1")
-	goalID := domaingoal.GoalID("1")
 	goal, err := ctrl.GoalUsecase.CheckInGoal(memberID, goalID, "Task 1", 50, "First check in")
 
 	response := ReponseBuilder(ctrl.Mapper).Content(goal).Error(err).Build()
