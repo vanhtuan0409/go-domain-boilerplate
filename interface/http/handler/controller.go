@@ -1,11 +1,19 @@
 package handler
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	domaingoal "github.com/vanhtuan0409/go-domain-boilerplate/domain/goal"
 	domainmember "github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
+	"github.com/vanhtuan0409/go-domain-boilerplate/interface/http/requestmodel"
+)
+
+var (
+	ErrorParseCheckInRequest = errors.New("Parse Check in request failed")
+	ErrorInvalidToken        = errors.New("Invalid Token")
 )
 
 type Controller struct {
@@ -39,12 +47,35 @@ func (ctrl *Controller) ListMemberGoal(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ctrl *Controller) CheckInTask(w http.ResponseWriter, r *http.Request) {
+	// Parse goalID
 	vars := mux.Vars(r)
 	goalID := domaingoal.GoalID(vars["goalID"])
 
-	memberID := domainmember.MemberID("1")
-	goal, err := ctrl.GoalUsecase.CheckInGoal(memberID, goalID, "Task 1", 50, "First check in")
+	// Parse memberID
+	token := r.Header.Get("Authorization")
+	if len(token) <= 7 {
+		response := ReponseBuilder(ctrl.Mapper).Error(ErrorInvalidToken).Build()
+		SendJSONResponse(response, w)
+		return
+	}
+	memberID := domainmember.MemberID(token[7:])
 
+	// Parse checkin request
+	decoder := json.NewDecoder(r.Body)
+	checkin := requestmodel.CheckIn{}
+	if err := decoder.Decode(&checkin); err != nil {
+		response := ReponseBuilder(ctrl.Mapper).Error(ErrorParseCheckInRequest).Build()
+		SendJSONResponse(response, w)
+		return
+	}
+
+	// Excute checkin logic
+	goal, err := ctrl.GoalUsecase.CheckInGoal(
+		memberID, goalID,
+		checkin.Name, checkin.Value, checkin.Message,
+	)
+
+	// Return response
 	response := ReponseBuilder(ctrl.Mapper).Content(goal).Error(err).Build()
 	SendJSONResponse(response, w)
 }

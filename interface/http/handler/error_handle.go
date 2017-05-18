@@ -18,11 +18,20 @@ func (*ErrorMapper) MapHttpCode(err error) int {
 	if err == goaldomain.ErrorGoalNotFound {
 		return http.StatusNotFound
 	}
+	if err == goaldomain.ErrorTaskNotFound {
+		return http.StatusNotFound
+	}
 	if err == memberdomain.ErrorMemberNotFound {
 		return http.StatusNotFound
 	}
 	if err == goal.ErrorUnauthorizeAccessGoal {
 		return http.StatusUnauthorized
+	}
+	if err == ErrorInvalidToken {
+		return http.StatusUnauthorized
+	}
+	if err == ErrorParseCheckInRequest {
+		return http.StatusBadRequest
 	}
 	return http.StatusInternalServerError
 }
