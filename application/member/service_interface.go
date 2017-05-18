@@ -5,6 +5,7 @@ import (
 )
 
 type IMemberRepository interface {
+	GetAll() ([]*member.Member, error)
 	Get(memberID member.MemberID) (*member.Member, error)
 	Save(member *member.Member) error
 }

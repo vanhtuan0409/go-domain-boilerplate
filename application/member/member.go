@@ -14,6 +14,14 @@ func NewMemberUsecase(memberRepo IMemberRepository) *MemberUsecase {
 	return &usecase
 }
 
+func (u *MemberUsecase) ListAllMember() ([]*member.Member, error) {
+	return u.MemberRepo.GetAll()
+}
+
+func (u *MemberUsecase) Get(memberID member.MemberID) (*member.Member, error) {
+	return u.Get(memberID)
+}
+
 func (u *MemberUsecase) RegisterMember(name string) (*member.Member, error) {
 	member := member.NewMember(name)
 	if err := u.MemberRepo.Save(member); err != nil {
