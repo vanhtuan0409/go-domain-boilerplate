@@ -21,14 +21,14 @@ func NewController(gu IGoalUsecase, mu IMemberUsecase, mapper IErrorHandler) *Co
 	return &controller
 }
 
-func (ctrl *Controller) ListAllMember(w http.ResponseWriter, req *http.Request) {
+func (ctrl *Controller) ListAllMember(w http.ResponseWriter, r *http.Request) {
 	members, err := ctrl.MemberUsecase.ListAllMember()
 
 	response := ReponseBuilder(ctrl.Mapper).Content(members).Error(err).Build()
 	SendJSONResponse(response, w)
 }
 
-func (ctrl *Controller) ListMemberGoal(w http.ResponseWriter, req *http.Request) {
+func (ctrl *Controller) ListMemberGoal(w http.ResponseWriter, r *http.Request) {
 	memberID := domainmember.MemberID("1")
 	goals, err := ctrl.GoalUsecase.GetAllByMember(memberID)
 
@@ -36,7 +36,7 @@ func (ctrl *Controller) ListMemberGoal(w http.ResponseWriter, req *http.Request)
 	SendJSONResponse(response, w)
 }
 
-func (ctrl *Controller) CheckInTask(w http.ResponseWriter, req *http.Request) {
+func (ctrl *Controller) CheckInTask(w http.ResponseWriter, r *http.Request) {
 	memberID := domainmember.MemberID("1")
 	goalID := domaingoal.GoalID("1")
 	goal, err := ctrl.GoalUsecase.CheckInGoal(memberID, goalID, "Task 1", 50, "First check in")

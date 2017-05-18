@@ -78,6 +78,7 @@ func SendJSONResponse(res *Response, w http.ResponseWriter) error {
 		w.WriteHeader(http.StatusInternalServerError)
 		return err
 	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(res.GetHttpCode())
 	w.Write(js)
 	return nil

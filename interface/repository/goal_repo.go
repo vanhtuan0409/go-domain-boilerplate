@@ -7,6 +7,55 @@ import (
 	"github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
 )
 
+var (
+	defaultGoalDB = map[goal.GoalID]*goal.Goal{
+		goal.GoalID("1"): &goal.Goal{
+			ID:          goal.GoalID("1"),
+			OwnerID:     member.MemberID("1"),
+			Name:        "Goal 1",
+			Description: "Meow meow",
+			Tasks: []*goal.Task{
+				&goal.Task{
+					Name:          "Goal 1 Task 1",
+					Description:   "",
+					CurrentValue:  5,
+					ExpectedValue: 10,
+					Unit:          "customers",
+				},
+			},
+		},
+		goal.GoalID("2"): &goal.Goal{
+			ID:          goal.GoalID("2"),
+			OwnerID:     member.MemberID("1"),
+			Name:        "Goal 2",
+			Description: "Grao Grao",
+			Tasks:       []*goal.Task{},
+		},
+		goal.GoalID("3"): &goal.Goal{
+			ID:          goal.GoalID("3"),
+			OwnerID:     member.MemberID("2"),
+			Name:        "Goal 3",
+			Description: "Cap cap",
+			Tasks:       []*goal.Task{},
+		},
+		goal.GoalID("4"): &goal.Goal{
+			ID:          goal.GoalID("4"),
+			OwnerID:     member.MemberID("2"),
+			Name:        "Goal 4",
+			Description: "Blah blah",
+			Tasks: []*goal.Task{
+				&goal.Task{
+					Name:          "Goal 4 Task 1",
+					Description:   "Asasdasdasd",
+					CurrentValue:  0,
+					ExpectedValue: 100,
+					Unit:          "%",
+				},
+			},
+		},
+	}
+)
+
 type InMemGoalRepo struct {
 	mtx  sync.RWMutex
 	goal map[goal.GoalID]*goal.Goal
@@ -14,7 +63,7 @@ type InMemGoalRepo struct {
 
 func NewInMemGoalRepo() *InMemGoalRepo {
 	return &InMemGoalRepo{
-		goal: make(map[goal.GoalID]*goal.Goal),
+		goal: defaultGoalDB,
 	}
 }
 

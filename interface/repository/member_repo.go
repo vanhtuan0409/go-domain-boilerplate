@@ -6,6 +6,25 @@ import (
 	"github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
 )
 
+var (
+	defaultMemberDB = map[member.MemberID]*member.Member{
+		member.MemberID("1"): &member.Member{
+			ID:   member.MemberID("1"),
+			Name: "Tuan",
+			Emails: []member.Email{
+				member.Email("shiro@zabuton.co.jp"),
+			},
+		},
+		member.MemberID("2"): &member.Member{
+			ID:   member.MemberID("2"),
+			Name: "Tue",
+			Emails: []member.Email{
+				member.Email("kenji@zabuton.co.jp"),
+			},
+		},
+	}
+)
+
 type InMemMemberRepo struct {
 	mtx    sync.RWMutex
 	member map[member.MemberID]*member.Member
@@ -13,7 +32,7 @@ type InMemMemberRepo struct {
 
 func NewInMemMemberRepo() *InMemMemberRepo {
 	return &InMemMemberRepo{
-		member: make(map[member.MemberID]*member.Member),
+		member: defaultMemberDB,
 	}
 }
 
