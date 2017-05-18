@@ -1,38 +1,50 @@
-package http
+package handler
 
 import (
 	"encoding/json"
 	"net/http"
 )
 
+type IErrorMapper interface {
+	MapHttpCode(err error) int
+	MapContent(err error) interface{}
+}
+
 type Response struct {
-	HttpCode int
-	Content  interface{}
-	Error    error
+	httpCode    int
+	content     interface{}
+	err         error
+	errorMapper IErrorMapper
 }
 
 func (r *Response) GetHttpCode() int {
-	if r.Error != nil {
-		return GetStatusCodeFromError(r.Error)
+	if r.err != nil {
+		return r.errorMapper.MapHttpCode(r.err)
 	}
-	return r.HttpCode
+	if r.httpCode != 0 {
+		return r.httpCode
+	}
+	return http.StatusOK
 }
 
 func (r *Response) GetJSON() ([]byte, error) {
-	if r.Error != nil {
-		return []byte(r.Error.Error()), nil
+	if r.err != nil {
+		errorContent := r.errorMapper.MapContent(r.err)
+		return json.Marshal(errorContent)
 	}
-	return json.Marshal(r.Content)
+	return json.Marshal(r.content)
 }
 
 type Builder struct {
-	httpCode int
-	content  interface{}
-	err      error
+	httpCode    int
+	content     interface{}
+	err         error
+	errorMapper IErrorMapper
 }
 
-func ReponseBuilder() *Builder {
+func ReponseBuilder(mapper IErrorMapper) *Builder {
 	builder := Builder{}
+	builder.errorMapper = mapper
 	return &builder
 }
 
@@ -53,9 +65,10 @@ func (b *Builder) Error(err error) *Builder {
 
 func (b *Builder) Build() *Response {
 	response := Response{}
-	response.HttpCode = b.httpCode
-	response.Content = b.content
-	response.Error = b.err
+	response.httpCode = b.httpCode
+	response.content = b.content
+	response.err = b.err
+	response.errorMapper = b.errorMapper
 	return &response
 }
 

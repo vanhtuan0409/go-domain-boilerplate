@@ -1,4 +1,4 @@
-package http
+package handler
 
 import (
 	"net/http"
@@ -10,19 +10,21 @@ import (
 type Controller struct {
 	GoalUsecase   IGoalUsecase
 	MemberUsecase IMemberUsecase
+	Mapper        IErrorMapper
 }
 
-func NewController(gu IGoalUsecase, mu IMemberUsecase) *Controller {
+func NewController(gu IGoalUsecase, mu IMemberUsecase, mapper IErrorMapper) *Controller {
 	controller := Controller{}
 	controller.GoalUsecase = gu
 	controller.MemberUsecase = mu
+	controller.Mapper = mapper
 	return &controller
 }
 
 func (ctrl *Controller) ListAllMember(w http.ResponseWriter, req *http.Request) {
 	members, err := ctrl.MemberUsecase.ListAllMember()
 
-	response := ReponseBuilder().Content(members).Error(err).Build()
+	response := ReponseBuilder(ctrl.Mapper).Content(members).Error(err).Build()
 	SendJSONResponse(response, w)
 }
 
@@ -30,7 +32,7 @@ func (ctrl *Controller) ListMemberGoal(w http.ResponseWriter, req *http.Request)
 	memberID := domainmember.MemberID("1")
 	goals, err := ctrl.GoalUsecase.GetAllByMember(memberID)
 
-	response := ReponseBuilder().Content(goals).Error(err).Build()
+	response := ReponseBuilder(ctrl.Mapper).Content(goals).Error(err).Build()
 	SendJSONResponse(response, w)
 }
 
@@ -39,6 +41,6 @@ func (ctrl *Controller) CheckInTask(w http.ResponseWriter, req *http.Request) {
 	goalID := domaingoal.GoalID("1")
 	goal, err := ctrl.GoalUsecase.CheckInGoal(memberID, goalID, "Task 1", 50, "First check in")
 
-	response := ReponseBuilder().Content(goal).Error(err).Build()
+	response := ReponseBuilder(ctrl.Mapper).Content(goal).Error(err).Build()
 	SendJSONResponse(response, w)
 }

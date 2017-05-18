@@ -1,4 +1,4 @@
-package http
+package handler
 
 import (
 	"github.com/vanhtuan0409/go-domain-boilerplate/domain/goal"

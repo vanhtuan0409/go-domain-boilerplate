@@ -12,7 +12,7 @@ import (
 	"github.com/vanhtuan0409/go-domain-boilerplate/application/goal"
 	"github.com/vanhtuan0409/go-domain-boilerplate/application/member"
 	"github.com/vanhtuan0409/go-domain-boilerplate/infrastructure/eventbus"
-	interfacehttp "github.com/vanhtuan0409/go-domain-boilerplate/interface/http"
+	"github.com/vanhtuan0409/go-domain-boilerplate/interface/http/handler"
 	"github.com/vanhtuan0409/go-domain-boilerplate/interface/repository"
 
 	graceful "gopkg.in/tylerb/graceful.v1"
@@ -31,7 +31,8 @@ func main() {
 	)
 	memberUsecase := member.NewMemberUsecase(memberRepo)
 
-	controller := interfacehttp.NewController(goalUsecase, memberUsecase)
+	errorMapper := &handler.ErrorMapper{}
+	controller := handler.NewController(goalUsecase, memberUsecase, errorMapper)
 
 	routes := InitRoute(controller)
 	server := &graceful.Server{
@@ -46,7 +47,7 @@ func main() {
 	server.ListenAndServe()
 }
 
-func InitRoute(ctrl *interfacehttp.Controller) *negroni.Negroni {
+func InitRoute(ctrl *handler.Controller) *negroni.Negroni {
 	recoveryMdw := negroni.NewRecovery()
 	corsMdw := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
