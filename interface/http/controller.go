@@ -12,29 +12,26 @@ type Controller struct {
 	MemberUsecase member.MemberUsecase
 }
 
-func (ctrl *Controller) RegisterMember(res http.ResponseWriter, req *http.Request) {
-    // TODO: parse information from http request
-    userName := "Shiro"
-    user, err := ctrl.MemberUsecase.RegisterMember(userName)
+func (ctrl *Controller) ListAllMember(w http.ResponseWriter, req *http.Request) {
+    members, err := ctrl.MemberUsecase.ListAllMember()
+
+    response := ReponseBuilder().Content(members).Error(err).Build()
+    SendJSONResponse(response, w)
 }
 
-func (ctrl *Controller) RegisterNewEmail(res http.ResponseWriter, req *http.Request) {
-    // TODO: parse information from http request
+func (ctrl *Controller) ListMemberGoal(w http.ResponseWriter, req *http.Request) {
     memberID := domainmember.MemberID("1")
-    email := domainmember.Email("vanhtuan0409@gmail.com")
-    member, err := ctrl.MemberUsecase.RegisterNewEmail(memberID, email)
+    goals, err := ctrl.GoalUsecase.GetAllByMember(memberID)
+
+    response := ReponseBuilder().Content(goals).Error(err).Build()
+    SendJSONResponse(response, w)
 }
 
-func (ctrl *Controller) AddTaskToGoal(res http.ResponseWriter, req *http.Request) {
-    // TODO: parse information from http request
-    memberID := domainmember.MemberID("1")
-    goalID := domaingoal.GoalID("1")
-    goal, err := ctrl.GoalUsecase.AddTaskToGoal(memberID, goalID, "Task 1", "", 100, "time")
-}
-
-func (ctrl *Controller) CheckInTask(res http.ResponseWriter, req *http.Request) {
-    // TODO: parse information from http request
+func (ctrl *Controller) CheckInTask(w http.ResponseWriter, req *http.Request) {
     memberID := domainmember.MemberID("1")
     goalID := domaingoal.GoalID("1")
     goal, err := ctrl.GoalUsecase.CheckInGoal(memberID, goalID, "Task 1", 50, "First check in")
+
+    response := ReponseBuilder().Content(goal).Error(err)
+    SendJSONResponse(response, w)
 }

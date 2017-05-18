@@ -4,19 +4,23 @@ import (
 	"net/http"
 	"reflect"
 
-    "github.com/vanhtuan0409/go-domain-boilerplate/domain/goal"
-    "github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
+    "github.com/vanhtuan0409/go-domain-boilerplate/application/goal"
+    goaldomain "github.com/vanhtuan0409/go-domain-boilerplate/domain/goal"
+    memberdomain "github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
 )
 
 func GetStatusCodeFromError(err error) int {
     if err == nil {
         return http.StatusOK
     }
-    if err == goal.ErrorGoalNotFound {
+    if err == goaldomain.ErrorGoalNotFound {
         return http.StatusNotFound
     }
-    if err == member.ErrorMemberNotFound {
+    if err == memberdomain.ErrorMemberNotFound {
         return http.StatusNotFound
+    }
+    if err == goal.ErrorUnauthorizeAccessGoal {
+        return http.StatusUnauthorized
     }
     return http.StatusInternalServerError
 }

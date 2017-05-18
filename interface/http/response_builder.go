@@ -2,12 +2,24 @@ package http
 
 import (
     "net/http"
+	"encoding/json"
 )
 
 type Response struct {
     HttpCode int
     Content interface{}
     Error error
+}
+
+func (r *Response) GetHttpCode() int {
+    if r.HttpCode != 0 {
+        return r.HttpCode
+    }
+    return GetStatusCodeFromError(r.Error)
+}
+
+func (r *Response) GetJSON() ([]byte, error) {
+    return json.Marshal(r.Content)
 }
 
 type Builder struct {
@@ -44,6 +56,14 @@ func (b *Builder) Build() *Response {
     return &response
 }
 
-func SendResponse(res Response, w http.ResponseWriter) error {
+func SendJSONResponse(res Response, w http.ResponseWriter) error {
+    js, err := res.GetJSON()
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        w.Write("")
+        return err
+    }
+    w.WriteHeader(res.GetHttpCode())
+    w.Write(js)
     return nil
 }
