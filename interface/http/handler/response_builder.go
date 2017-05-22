@@ -3,6 +3,11 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/vanhtuan0409/go-domain-boilerplate/application/goal"
+	goaldomain "github.com/vanhtuan0409/go-domain-boilerplate/domain/goal"
+	memberdomain "github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
+	"github.com/vanhtuan0409/go-domain-boilerplate/infrastructure/logger"
 )
 
 type IErrorHandler interface {
@@ -13,19 +18,28 @@ type IErrorHandler interface {
 type Response struct {
 	HttpCode int
 	Content  interface{}
-	Err      error
+}
+
+func (r *Response) SendJSON(w http.ResponseWriter) error {
+	js, err := json.Marshal(r.Content)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Internal server error"))
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(r.HttpCode)
+	w.Write(js)
+	return nil
 }
 
 type Builder struct {
-	httpCode    int
-	content     interface{}
-	err         error
-	errorMapper IErrorHandler
+	httpCode int
+	content  interface{}
 }
 
-func ReponseBuilder(mapper IErrorHandler) *Builder {
+func ReponseBuilder() *Builder {
 	builder := Builder{}
-	builder.errorMapper = mapper
 	return &builder
 }
 
@@ -39,45 +53,51 @@ func (b *Builder) Content(content interface{}) *Builder {
 	return b
 }
 
-func (b *Builder) Error(err error) *Builder {
-	b.err = err
-	return b
-}
-
 func (b *Builder) Build() *Response {
 	response := Response{}
-	response.HttpCode = b.getStatusCode()
-	response.Content = b.getContent()
-	response.Err = b.err
+	response.HttpCode = http.StatusNoContent
+	if b.httpCode != 0 {
+		response.HttpCode = b.httpCode
+	}
+	response.Content = ""
+	if b.content != nil {
+		response.Content = b.content
+	}
 	return &response
 }
 
-func (b *Builder) getStatusCode() int {
-	if b.err != nil {
-		return b.errorMapper.MapHttpCode(b.err)
-	}
-	if b.httpCode != 0 {
-		return b.httpCode
-	}
-	return http.StatusOK
+var ResponseOK = func(content interface{}) *Response {
+	response := Response{}
+	response.HttpCode = http.StatusOK
+	response.Content = content
+	return &response
 }
 
-func (b *Builder) getContent() interface{} {
-	if b.err != nil {
-		return b.errorMapper.MapContent(b.err)
+var ResponseError = func(err error) *Response {
+	response := Response{}
+	response.Content = err.Error()
+	if err == goaldomain.ErrorGoalNotFound {
+		response.HttpCode = http.StatusNotFound
+	} else if err == goaldomain.ErrorTaskNotFound {
+		response.HttpCode = http.StatusNotFound
+	} else if err == memberdomain.ErrorMemberNotFound {
+		response.HttpCode = http.StatusNotFound
+	} else if err == goal.ErrorUnauthorizeAccessGoal {
+		response.HttpCode = http.StatusUnauthorized
+	} else if err == ErrorInvalidToken {
+		response.HttpCode = http.StatusUnauthorized
+	} else if err == ErrorParseCheckInRequest {
+		response.HttpCode = http.StatusBadRequest
+	} else {
+		response.HttpCode = http.StatusInternalServerError
 	}
-	return b.content
+	logger.Logger.Error(response.Content)
+	return &response
 }
 
-func SendJSONResponse(res *Response, w http.ResponseWriter) error {
-	js, err := json.Marshal(res.Content)
+var ResponseFactory = func(content interface{}, err error) *Response {
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Internal server error"))
-		return err
+		return ResponseError(err)
 	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(res.HttpCode)
-	w.Write(js)
-	return nil
+	return ResponseOK(content)
 }

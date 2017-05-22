@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
+	"github.com/vanhtuan0409/go-domain-boilerplate/infrastructure/logger"
 )
 
 // ITokenProvider Sample token provider interface
@@ -32,7 +33,8 @@ func (t *TokenMiddleware) ServeHTTP(
 	memberID, err := t.parser.ParseTokenFromHeader(r)
 	if err != nil {
 		rw.WriteHeader(http.StatusUnauthorized)
-		rw.Write([]byte(err.Error()))
+		rw.Write([]byte("Authorization header format must be Bearer {token}"))
+		logger.Logger.Error("Authorization header format must be Bearer {token}")
 		return
 	}
 	newContext := context.WithValue(r.Context(), "memberID", memberID)

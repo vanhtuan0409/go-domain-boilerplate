@@ -19,31 +19,25 @@ var (
 type Controller struct {
 	GoalUsecase   IGoalUsecase
 	MemberUsecase IMemberUsecase
-	Mapper        IErrorHandler
 }
 
-func NewController(gu IGoalUsecase, mu IMemberUsecase, mapper IErrorHandler) *Controller {
+func NewController(gu IGoalUsecase, mu IMemberUsecase) *Controller {
 	controller := Controller{}
 	controller.GoalUsecase = gu
 	controller.MemberUsecase = mu
-	controller.Mapper = mapper
 	return &controller
 }
 
 func (ctrl *Controller) ListAllMember(w http.ResponseWriter, r *http.Request) {
 	members, err := ctrl.MemberUsecase.ListAllMember()
-
-	response := ReponseBuilder(ctrl.Mapper).Content(members).Error(err).Build()
-	SendJSONResponse(response, w)
+	ResponseFactory(members, err).SendJSON(w)
 }
 
 func (ctrl *Controller) ListMemberGoal(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	memberID := domainmember.MemberID(vars["memberID"])
 	goals, err := ctrl.GoalUsecase.GetAllByMember(memberID)
-
-	response := ReponseBuilder(ctrl.Mapper).Content(goals).Error(err).Build()
-	SendJSONResponse(response, w)
+	ResponseFactory(goals, err).SendJSON(w)
 }
 
 func (ctrl *Controller) CheckInTask(w http.ResponseWriter, r *http.Request) {
@@ -58,8 +52,7 @@ func (ctrl *Controller) CheckInTask(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	checkin := requestmodel.CheckIn{}
 	if err := decoder.Decode(&checkin); err != nil {
-		response := ReponseBuilder(ctrl.Mapper).Error(ErrorParseCheckInRequest).Build()
-		SendJSONResponse(response, w)
+		ResponseError(ErrorParseCheckInRequest).SendJSON(w)
 		return
 	}
 
@@ -68,8 +61,5 @@ func (ctrl *Controller) CheckInTask(w http.ResponseWriter, r *http.Request) {
 		memberID, goalID,
 		checkin.Name, checkin.Value, checkin.Message,
 	)
-
-	// Return response
-	response := ReponseBuilder(ctrl.Mapper).Content(goal).Error(err).Build()
-	SendJSONResponse(response, w)
+	ResponseFactory(goal, err).SendJSON(w)
 }

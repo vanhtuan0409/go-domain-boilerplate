@@ -38,8 +38,7 @@ func main() {
 		accessControlService, dispatcher,
 	)
 	memberUsecase := member.NewMemberUsecase(memberRepo)
-	errorMapper := &handler.ErrorMapper{}
-	controller := handler.NewController(goalUsecase, memberUsecase, errorMapper)
+	controller := handler.NewController(goalUsecase, memberUsecase)
 
 	// Init router
 	routes := InitRoute(controller)

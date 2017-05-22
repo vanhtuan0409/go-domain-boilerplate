@@ -1,5 +1,5 @@
-hash: b638f09356f857d662dceaa7149c0a251d26173b7d4c2feb84b86208b4691f69
-updated: 2017-05-18T11:04:54.916178861+07:00
+hash: 8e8aacfd9dadb3127221740c12d89cf27ddaf6477e0e53930380068e1ba7dfe8
+updated: 2017-05-18T16:21:39.035184472+07:00
 imports:
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
@@ -13,6 +13,8 @@ imports:
   version: 879c5887cd475cd7864858769793b2ceb0d44feb
 - name: github.com/Sirupsen/logrus
   version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
+- name: github.com/streadway/amqp
+  version: 1c63b162b69cf6834e0b30e496c4cd5d6ee2a1d1
 - name: github.com/stretchr/testify
   version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
 - name: github.com/urfave/negroni
@@ -21,6 +23,10 @@ imports:
   version: ffe101cce3477a6c6d8f0754d103bb0a84ec1266
   subpackages:
   - context
+- name: golang.org/x/sys
+  version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
+  subpackages:
+  - unix
 - name: gopkg.in/tylerb/graceful.v1
   version: 4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb
 testImports: []
