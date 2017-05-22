@@ -4,24 +4,24 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
+	"github.com/vanhtuan0409/go-domain-boilerplate/application/accesscontrol"
 	"github.com/vanhtuan0409/go-domain-boilerplate/infrastructure/logger"
 )
 
-// ITokenProvider Sample token provider interface
-// Should modify for correct type return
 type ITokenParser interface {
-	ParseToken(token string) (member.MemberID, error)
-	ParseTokenFromHeader(r *http.Request) (member.MemberID, error)
+	ParseToken(token string) (*accesscontrol.AuthInfo, error)
+	ParseTokenFromHeader(r *http.Request) (*accesscontrol.AuthInfo, error)
 }
 
 type TokenMiddleware struct {
+	key    string
 	parser ITokenParser
 }
 
-func NewTokenMiddleware(p ITokenParser) *TokenMiddleware {
+func NewTokenMiddleware(k string, p ITokenParser) *TokenMiddleware {
 	return &TokenMiddleware{
 		parser: p,
+		key:    k,
 	}
 }
 
@@ -30,13 +30,13 @@ func (t *TokenMiddleware) ServeHTTP(
 	r *http.Request,
 	next http.HandlerFunc,
 ) {
-	memberID, err := t.parser.ParseTokenFromHeader(r)
+	authInfo, err := t.parser.ParseTokenFromHeader(r)
 	if err != nil {
 		rw.WriteHeader(http.StatusUnauthorized)
 		rw.Write([]byte("Authorization header format must be Bearer {token}"))
 		logger.Logger.Error("Authorization header format must be Bearer {token}")
 		return
 	}
-	newContext := context.WithValue(r.Context(), "memberID", memberID)
+	newContext := context.WithValue(r.Context(), t.key, authInfo)
 	next.ServeHTTP(rw, r.WithContext(newContext))
 }

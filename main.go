@@ -19,6 +19,10 @@ import (
 	"github.com/vanhtuan0409/go-domain-boilerplate/interface/repository"
 )
 
+var (
+	tokenContextKey = "authInfo"
+)
+
 func main() {
 	// Set logger
 	logwriter := logger.NewLogrusStdLogger()
@@ -57,7 +61,7 @@ func InitRoute(ctrl *handler.Controller) *mux.Router {
 	tokenProvider := tokenprovider.NewTokenProvider()
 
 	loggerMdw := middleware.NewLoggerMiddleware()
-	tokenMdw := middleware.NewTokenMiddleware(tokenProvider)
+	tokenMdw := middleware.NewTokenMiddleware(tokenContextKey, tokenProvider)
 	corsMdw := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"},
@@ -71,21 +75,14 @@ func InitRoute(ctrl *handler.Controller) *mux.Router {
 
 	r := mux.NewRouter()
 	r.Path("/members").Methods("GET").Handler(
-		WithHandleFunc(commonMdw, ctrl.ListAllMember),
+		middleware.AdaptHandleFunc(commonMdw, tokenContextKey, ctrl.ListAllMember),
 	)
 	r.Path("/members/{memberID}/goals").Methods("GET").Handler(
-		WithHandleFunc(commonMdw, ctrl.ListMemberGoal),
+		middleware.AdaptHandleFunc(commonMdw, tokenContextKey, ctrl.ListMemberGoal),
 	)
 	r.Path("/goals/{goalID}/checkin").Methods("POST").Handler(
-		WithHandleFunc(protectMdw, ctrl.CheckInTask),
+		middleware.AdaptHandleFunc(protectMdw, tokenContextKey, ctrl.CheckInTask),
 	)
 
 	return r
-}
-
-func WithHandleFunc(mdw *negroni.Negroni, handlerFunc func(rw http.ResponseWriter, r *http.Request)) *negroni.Negroni {
-	handlers := mdw.Handlers()
-	newMdw := negroni.New(handlers...)
-	newMdw.UseHandlerFunc(handlerFunc)
-	return newMdw
 }

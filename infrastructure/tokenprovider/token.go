@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/vanhtuan0409/go-domain-boilerplate/application/accesscontrol"
 	"github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
 )
 
@@ -15,14 +16,17 @@ func NewTokenProvider() *TokenProvider {
 	return &TokenProvider{}
 }
 
-func (t *TokenProvider) ParseToken(token string) (member.MemberID, error) {
-	return member.MemberID(token), nil
+func (t *TokenProvider) ParseToken(token string) (*accesscontrol.AuthInfo, error) {
+	memberID := member.MemberID(token)
+	auth := accesscontrol.AuthInfo{}
+	auth.MemberID = memberID
+	return &auth, nil
 }
 
-func (t *TokenProvider) ParseTokenFromHeader(r *http.Request) (member.MemberID, error) {
+func (t *TokenProvider) ParseTokenFromHeader(r *http.Request) (*accesscontrol.AuthInfo, error) {
 	token, err := t.getTokenFromHeader(r)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	return t.ParseToken(token)
 }

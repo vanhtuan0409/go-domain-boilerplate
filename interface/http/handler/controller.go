@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/vanhtuan0409/go-domain-boilerplate/application/accesscontrol"
 	domaingoal "github.com/vanhtuan0409/go-domain-boilerplate/domain/goal"
 	domainmember "github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
 	"github.com/vanhtuan0409/go-domain-boilerplate/interface/http/requestmodel"
@@ -28,25 +29,22 @@ func NewController(gu IGoalUsecase, mu IMemberUsecase) *Controller {
 	return &controller
 }
 
-func (ctrl *Controller) ListAllMember(w http.ResponseWriter, r *http.Request) {
+func (ctrl *Controller) ListAllMember(w http.ResponseWriter, r *http.Request, auth *accesscontrol.AuthInfo) {
 	members, err := ctrl.MemberUsecase.ListAllMember()
 	ResponseFactory(members, err).SendJSON(w)
 }
 
-func (ctrl *Controller) ListMemberGoal(w http.ResponseWriter, r *http.Request) {
+func (ctrl *Controller) ListMemberGoal(w http.ResponseWriter, r *http.Request, auth *accesscontrol.AuthInfo) {
 	vars := mux.Vars(r)
 	memberID := domainmember.MemberID(vars["memberID"])
 	goals, err := ctrl.GoalUsecase.GetAllByMember(memberID)
 	ResponseFactory(goals, err).SendJSON(w)
 }
 
-func (ctrl *Controller) CheckInTask(w http.ResponseWriter, r *http.Request) {
+func (ctrl *Controller) CheckInTask(w http.ResponseWriter, r *http.Request, auth *accesscontrol.AuthInfo) {
 	// Parse goalID
 	vars := mux.Vars(r)
 	goalID := domaingoal.GoalID(vars["goalID"])
-
-	// Parse memberID
-	memberID := r.Context().Value("memberID").(domainmember.MemberID)
 
 	// Parse checkin request
 	decoder := json.NewDecoder(r.Body)
@@ -58,7 +56,7 @@ func (ctrl *Controller) CheckInTask(w http.ResponseWriter, r *http.Request) {
 
 	// Excute checkin logic
 	goal, err := ctrl.GoalUsecase.CheckInGoal(
-		memberID, goalID,
+		auth.MemberID, goalID,
 		checkin.Name, checkin.Value, checkin.Message,
 	)
 	ResponseFactory(goal, err).SendJSON(w)
