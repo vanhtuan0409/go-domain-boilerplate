@@ -5,5 +5,5 @@ import (
 )
 
 type IEventDispatcher interface {
-	Dispatch(events ...common.IDomainEvent)
+	Dispatch(events ...common.IDomainEvent) error
 }

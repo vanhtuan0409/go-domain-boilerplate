@@ -1,10 +1,18 @@
-hash: 8e8aacfd9dadb3127221740c12d89cf27ddaf6477e0e53930380068e1ba7dfe8
-updated: 2017-05-18T16:21:39.035184472+07:00
+hash: f09eb5daf850cb26c19deb91da8398aac77f6fab87cdd24194e5bcf2ca9525ae
+updated: 2017-05-31T11:37:06.315009618+07:00
 imports:
+- name: github.com/bitly/go-nsq
+  version: d71fb89c9e0263aaed89645b0b168e11ccf597b1
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
   version: 392c28fe23e1c45ddba891b0320b3b5df220beea
+- name: github.com/mreiferson/go-snappystream
+  version: 028eae7ab5c4c9e2d1cb4c4ca1e53259bbe7e504
+  subpackages:
+  - snappy-go
+- name: github.com/nsqio/go-nsq
+  version: d71fb89c9e0263aaed89645b0b168e11ccf597b1
 - name: github.com/rs/cors
   version: a62a804a8a009876ca59105f7899938a1349f4b3
 - name: github.com/rs/xhandler
@@ -13,8 +21,6 @@ imports:
   version: 879c5887cd475cd7864858769793b2ceb0d44feb
 - name: github.com/Sirupsen/logrus
   version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
-- name: github.com/streadway/amqp
-  version: 1c63b162b69cf6834e0b30e496c4cd5d6ee2a1d1
 - name: github.com/stretchr/testify
   version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
 - name: github.com/urfave/negroni
@@ -27,6 +33,4 @@ imports:
   version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
   subpackages:
   - unix
-- name: gopkg.in/tylerb/graceful.v1
-  version: 4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb
 testImports: []
