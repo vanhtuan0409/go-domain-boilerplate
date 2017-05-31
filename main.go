@@ -46,16 +46,21 @@ func main() {
 	accessControlService := accesscontrol.NewAccessControl()
 	dispatcher := eventbus.NewEventDispatcher(w)
 
-	// Init event handler
-	InitEventHandler()
-
-	// Init controller
+	// Init usecase
 	goalUsecase := goal.NewGoalUsecase(
 		goalRepo, memberRepo,
 		accessControlService, dispatcher,
 	)
 	memberUsecase := member.NewMemberUsecase(memberRepo)
+
+	// Init http controller
 	controller := handler.NewController(goalUsecase, memberUsecase)
+
+	// Init event handler
+	eventHandler := eventhandler.NewEventHandler()
+
+	// Init event router
+	InitEventRoute(eventHandler)
 
 	// Init http router
 	routes := InitRoute(controller)
@@ -100,14 +105,18 @@ func InitRoute(ctrl *handler.Controller) *mux.Router {
 	return r
 }
 
-func InitEventHandler() {
+func InitEventRoute(handler *eventhandler.EventHandler) {
 	config := nsq.NewConfig()
 
 	addTaskHandler, _ := nsq.NewConsumer(domaingoal.EventAddTaskToGoalType, "ch1", config)
-	addTaskHandler.AddHandler(eventbus.MakeEventHandlerFunc(eventhandler.HandleAddTaskToGoal))
+	addTaskHandler.AddHandler(eventbus.MakeEventHandlerFunc(
+		handler.HandleAddTaskToGoal,
+	))
 	addTaskHandler.ConnectToNSQD(nsqServer)
 
 	checkinHandler, _ := nsq.NewConsumer(domaingoal.EventCheckInTaskType, "ch1", config)
-	checkinHandler.AddHandler(eventbus.MakeEventHandlerFunc(eventhandler.HandleCheckInTask))
+	checkinHandler.AddHandler(eventbus.MakeEventHandlerFunc(
+		handler.HandleCheckInTask,
+	))
 	checkinHandler.ConnectToNSQD(nsqServer)
 }

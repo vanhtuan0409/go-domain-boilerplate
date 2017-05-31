@@ -39,7 +39,7 @@ func (d *Dispatcher) dispatch(event common.IDomainEvent) error {
 	return d.nsqProducer.Publish(event.GetEventType(), js)
 }
 
-type EventHandler func(eventhandler.IEventMessage) error
+type EventHandlerFunc func(eventhandler.IEventMessage) error
 type eventMessage struct {
 	e *nsq.Message
 }
@@ -62,7 +62,7 @@ func (m *eventMessage) Retry() {
 	}
 }
 
-func MakeEventHandlerFunc(h EventHandler) nsq.HandlerFunc {
+func MakeEventHandlerFunc(h EventHandlerFunc) nsq.HandlerFunc {
 	return func(message *nsq.Message) error {
 		m := eventMessage{message}
 		return h(&m)

@@ -12,7 +12,14 @@ var (
 	ErrorParseMessageBody = errors.New("Error parse message body")
 )
 
-func HandleAddTaskToGoal(message IEventMessage) error {
+type EventHandler struct{}
+
+func NewEventHandler() *EventHandler {
+	handler := EventHandler{}
+	return &handler
+}
+
+func (h *EventHandler) HandleAddTaskToGoal(message IEventMessage) error {
 	request := goal.EventAddTaskToGoal{}
 	if err := json.Unmarshal(message.Body(), &request); err != nil {
 		return ErrorParseMessageBody
@@ -21,7 +28,7 @@ func HandleAddTaskToGoal(message IEventMessage) error {
 	return nil
 }
 
-func HandleCheckInTask(message IEventMessage) error {
+func (h *EventHandler) HandleCheckInTask(message IEventMessage) error {
 	request := goal.EventCheckInTask{}
 	if err := json.Unmarshal(message.Body(), &request); err != nil {
 		return ErrorParseMessageBody
