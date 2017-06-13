@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/NYTimes/gizmo/config"
 	"github.com/NYTimes/gizmo/server"
 	nsq "github.com/nsqio/go-nsq"
 	"github.com/vanhtuan0409/go-domain-boilerplate/application/accesscontrol"
@@ -45,12 +46,10 @@ func main() {
 	goalEndPoints := httpendpoints.NewGoalEndPoints(goalUsecase)
 	memberEndPoints := httpendpoints.NewMemberEndPoints(memberUsecase)
 
-	httpLogPath := "/Users/tuanvuong/Workspace/goworkspace/src/github.com/vanhtuan0409/go-domain-boilerplate/log/http_access.log"
-	sconfig := &server.Config{
-		HTTPPort:      8000,
-		HTTPAccessLog: &httpLogPath,
-	}
-	server.Init("godomain", sconfig)
+	sconfig := server.Config{}
+	config.LoadEnvConfig(&sconfig)
+
+	server.Init("godomain", &sconfig)
 	server.Register(goalEndPoints)
 	server.Register(memberEndPoints)
 	server.Run()
