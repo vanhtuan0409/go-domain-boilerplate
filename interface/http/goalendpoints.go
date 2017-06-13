@@ -8,15 +8,15 @@ import (
 	"github.com/NYTimes/gizmo/server"
 	"github.com/gorilla/mux"
 	"github.com/vanhtuan0409/go-domain-boilerplate/application/accesscontrol"
-	"github.com/vanhtuan0409/go-domain-boilerplate/domain/goal"
-	"github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
+	domaingoal "github.com/vanhtuan0409/go-domain-boilerplate/domain/goal"
+	domainmember "github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
 )
 
 type IGoalUsecase interface {
 	CheckInGoal(
-		actorID member.MemberID, goalID goal.GoalID,
+		actorID domainmember.MemberID, goalID domaingoal.GoalID,
 		taskName string, newValue int, message string,
-	) (*goal.Goal, error)
+	) (*domaingoal.Goal, error)
 }
 
 type GoalEndPoints struct {
@@ -46,7 +46,7 @@ func (e *GoalEndPoints) ContextMiddleware(h server.ContextHandler) server.Contex
 }
 
 func (e *GoalEndPoints) JSONContextMiddleware(h server.JSONContextEndpoint) server.JSONContextEndpoint {
-	return h
+	return ErrorHandle(h)
 }
 
 func (e *GoalEndPoints) ContextEndpoints() map[string]map[string]server.ContextHandlerFunc {
@@ -70,7 +70,7 @@ type CheckIn struct {
 func (e *GoalEndPoints) CheckIn(c context.Context, r *http.Request) (int, interface{}, error) {
 	// Parse goalID
 	vars := mux.Vars(r)
-	goalID := goal.GoalID(vars["goalID"])
+	goalID := domaingoal.GoalID(vars["goalID"])
 
 	// Parse checkin request
 	decoder := json.NewDecoder(r.Body)

@@ -39,7 +39,7 @@ func (e *MemberEndPoints) ContextMiddleware(h server.ContextHandler) server.Cont
 }
 
 func (e *MemberEndPoints) JSONContextMiddleware(h server.JSONContextEndpoint) server.JSONContextEndpoint {
-	return h
+	return ErrorHandle(h)
 }
 
 func (e *MemberEndPoints) ContextEndpoints() map[string]map[string]server.ContextHandlerFunc {
