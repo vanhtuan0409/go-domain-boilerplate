@@ -22,7 +22,5 @@ _testmain.go
 *.exe
 *.test
 *.prof
-!.gitkeep
 
 /vendor
-/docker/nsq/data

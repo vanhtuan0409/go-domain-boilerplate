@@ -45,8 +45,10 @@ func main() {
 	goalEndPoints := httpendpoints.NewGoalEndPoints(goalUsecase)
 	memberEndPoints := httpendpoints.NewMemberEndPoints(memberUsecase)
 
+	httpLogPath := "/Users/tuanvuong/Workspace/goworkspace/src/github.com/vanhtuan0409/go-domain-boilerplate/log/http_access.log"
 	sconfig := &server.Config{
-		HTTPPort: 8000,
+		HTTPPort:      8000,
+		HTTPAccessLog: &httpLogPath,
 	}
 	server.Init("godomain", sconfig)
 	server.Register(goalEndPoints)
