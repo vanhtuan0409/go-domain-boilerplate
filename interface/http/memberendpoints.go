@@ -5,12 +5,14 @@ import (
 	"net/http"
 
 	"github.com/NYTimes/gizmo/server"
+	"github.com/gorilla/mux"
+	"github.com/vanhtuan0409/go-domain-boilerplate/domain/goal"
 	"github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
 )
 
 type IMemberUsecase interface {
 	ListAllMember() ([]*member.Member, error)
-	// GetMemberGoals(memberID member.MemberID) ([]*goal.Goal, error)
+	GetMemberGoals(memberID member.MemberID) ([]*goal.Goal, error)
 }
 
 type MemberEndPoints struct {
@@ -48,9 +50,9 @@ func (e *MemberEndPoints) JSONEndpoints() map[string]map[string]server.JSONConte
 		"": map[string]server.JSONContextEndpoint{
 			"GET": e.Members,
 		},
-		// "/{memberID}/goals": map[string]server.JSONContextEndpoint{
-		// 	"GET": e.MemberGoals,
-		// },
+		"/{memberID}/goals": map[string]server.JSONContextEndpoint{
+			"GET": e.MemberGoals,
+		},
 	}
 }
 
@@ -59,9 +61,9 @@ func (e *MemberEndPoints) Members(c context.Context, r *http.Request) (int, inte
 	return 0, members, err
 }
 
-// func (e *MemberEndPoints) MemberGoals(c context.Context, r *http.Request) (int, interface{}, error) {
-// 	vars := mux.Vars(r)
-// 	memberID := member.MemberID(vars["memberID"])
-// 	goals, err := e.mu.GetMemberGoals(memberID)
-// 	return 0, goals, err
-// }
+func (e *MemberEndPoints) MemberGoals(c context.Context, r *http.Request) (int, interface{}, error) {
+	vars := mux.Vars(r)
+	memberID := member.MemberID(vars["memberID"])
+	goals, err := e.mu.GetMemberGoals(memberID)
+	return 0, goals, err
+}

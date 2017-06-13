@@ -12,7 +12,6 @@ import (
 )
 
 type IGoalUsecase interface {
-	GetAllByMember(memberID member.MemberID) ([]*goal.Goal, error)
 	CheckInGoal(
 		actorID member.MemberID, goalID goal.GoalID,
 		taskName string, newValue int, message string,

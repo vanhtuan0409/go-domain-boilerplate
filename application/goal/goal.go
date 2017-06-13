@@ -31,14 +31,6 @@ func NewGoalUsecase(
 	return &usecase
 }
 
-func (u *GoalUsecase) GetAllByMember(memberID member.MemberID) ([]*goal.Goal, error) {
-	_, err := u.MemberRepo.Get(memberID)
-	if err != nil {
-		return nil, err
-	}
-	return u.GoalRepo.GetAllByMember(memberID)
-}
-
 func (u *GoalUsecase) AddTaskToGoal(
 	actorID member.MemberID, goalID goal.GoalID,
 	taskName, description string,

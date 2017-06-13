@@ -7,7 +7,6 @@ import (
 
 type IGoalRepository interface {
 	Get(goalID goal.GoalID) (*goal.Goal, error)
-	GetAllByMember(memberID member.MemberID) ([]*goal.Goal, error)
 	Save(goal *goal.Goal) error
 }
 

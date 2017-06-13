@@ -40,7 +40,7 @@ func main() {
 		goalRepo, memberRepo,
 		accessControlService, dispatcher,
 	)
-	memberUsecase := member.NewMemberUsecase(memberRepo)
+	memberUsecase := member.NewMemberUsecase(memberRepo, goalRepo)
 
 	goalEndPoints := httpendpoints.NewGoalEndPoints(goalUsecase)
 	memberEndPoints := httpendpoints.NewMemberEndPoints(memberUsecase)
@@ -51,5 +51,5 @@ func main() {
 	server.Init("godomain", sconfig)
 	server.Register(goalEndPoints)
 	server.Register(memberEndPoints)
-	server.Log.Fatal(server.Run())
+	server.Run()
 }
