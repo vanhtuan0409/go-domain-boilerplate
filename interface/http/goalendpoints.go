@@ -7,6 +7,7 @@ import (
 
 	"github.com/NYTimes/gizmo/server"
 	"github.com/gorilla/mux"
+	"github.com/vanhtuan0409/go-domain-boilerplate/application/accesscontrol"
 	"github.com/vanhtuan0409/go-domain-boilerplate/domain/goal"
 	"github.com/vanhtuan0409/go-domain-boilerplate/domain/member"
 )
@@ -19,12 +20,14 @@ type IGoalUsecase interface {
 }
 
 type GoalEndPoints struct {
-	gu IGoalUsecase
+	gu          IGoalUsecase
+	tokenparser ITokenParser
 }
 
-func NewGoalEndPoints(gu IGoalUsecase) *GoalEndPoints {
+func NewGoalEndPoints(gu IGoalUsecase, p ITokenParser) *GoalEndPoints {
 	endpoints := GoalEndPoints{}
 	endpoints.gu = gu
+	endpoints.tokenparser = p
 	return &endpoints
 }
 
@@ -33,7 +36,9 @@ func (e *GoalEndPoints) Prefix() string {
 }
 
 func (e *GoalEndPoints) Middleware(h http.Handler) http.Handler {
-	return h
+	chained := server.CORSHandler(h, "*")
+	chained = TokenMiddleware(chained, e.tokenparser)
+	return chained
 }
 
 func (e *GoalEndPoints) ContextMiddleware(h server.ContextHandler) server.ContextHandler {
@@ -75,11 +80,15 @@ func (e *GoalEndPoints) CheckIn(c context.Context, r *http.Request) (int, interf
 	}
 
 	// Parse auth from context
-	memberID := member.MemberID("1")
+	raw := r.Context().Value("authInfo")
+	authInfo, ok := raw.(*accesscontrol.AuthInfo)
+	if !ok {
+		return 0, "", ErrorInvalidToken
+	}
 
 	// Excute checkin logic
 	goal, err := e.gu.CheckInGoal(
-		memberID, goalID,
+		authInfo.MemberID, goalID,
 		checkin.Name, checkin.Value, checkin.Message,
 	)
 	return 0, goal, err

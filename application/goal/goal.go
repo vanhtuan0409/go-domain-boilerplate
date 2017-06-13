@@ -82,6 +82,6 @@ func (u *GoalUsecase) CheckInGoal(
 		return nil, err
 	}
 
-	u.Dispatcher.Dispatch(goal.Events...)
+	// u.Dispatcher.Dispatch(goal.Events...)
 	return goal, nil
 }

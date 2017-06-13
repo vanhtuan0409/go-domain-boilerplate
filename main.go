@@ -8,7 +8,7 @@ import (
 	"github.com/vanhtuan0409/go-domain-boilerplate/application/goal"
 	"github.com/vanhtuan0409/go-domain-boilerplate/application/member"
 	"github.com/vanhtuan0409/go-domain-boilerplate/infrastructure/eventbus"
-	"github.com/vanhtuan0409/go-domain-boilerplate/infrastructure/logger"
+	"github.com/vanhtuan0409/go-domain-boilerplate/infrastructure/tokenprovider"
 	httpendpoints "github.com/vanhtuan0409/go-domain-boilerplate/interface/http"
 	"github.com/vanhtuan0409/go-domain-boilerplate/interface/repository"
 )
@@ -19,14 +19,13 @@ var (
 )
 
 func main() {
-	// Set logger
-	logwriter := logger.NewLogrusStdLogger()
-	logger.SetLogger(logwriter)
-
 	// Init nsq dispatcher
 	nsqConfig := nsq.NewConfig()
 	w, _ := nsq.NewProducer(nsqServer, nsqConfig)
 	defer w.Stop()
+
+	// Init token provider
+	tokenProvider := tokenprovider.NewTokenProvider()
 
 	// Init repo
 	goalRepo := repository.NewInMemGoalRepo()
@@ -43,7 +42,7 @@ func main() {
 	)
 	memberUsecase := member.NewMemberUsecase(memberRepo, goalRepo)
 
-	goalEndPoints := httpendpoints.NewGoalEndPoints(goalUsecase)
+	goalEndPoints := httpendpoints.NewGoalEndPoints(goalUsecase, tokenProvider)
 	memberEndPoints := httpendpoints.NewMemberEndPoints(memberUsecase)
 
 	sconfig := server.Config{}

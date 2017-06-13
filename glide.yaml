@@ -4,14 +4,6 @@ import:
   version: v1.1.4
 - package: github.com/satori/go.uuid
   version: v1.1.0
-- package: github.com/gorilla/mux
-  version: v1.3.0
-- package: github.com/Sirupsen/logrus
-  version: v0.11.5
-- package: github.com/urfave/negroni
-  version: v0.2.0
-- package: github.com/rs/cors
-  version: v1.0
 - package: github.com/nsqio/go-nsq
   version: v1.0.6
 - package: github.com/NYTimes/gizmo

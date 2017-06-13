@@ -30,7 +30,8 @@ func (e *MemberEndPoints) Prefix() string {
 }
 
 func (e *MemberEndPoints) Middleware(h http.Handler) http.Handler {
-	return h
+	chained := server.CORSHandler(h, "*")
+	return chained
 }
 
 func (e *MemberEndPoints) ContextMiddleware(h server.ContextHandler) server.ContextHandler {
