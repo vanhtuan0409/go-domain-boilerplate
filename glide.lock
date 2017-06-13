@@ -1,22 +1,109 @@
-hash: f09eb5daf850cb26c19deb91da8398aac77f6fab87cdd24194e5bcf2ca9525ae
-updated: 2017-05-31T11:37:06.315009618+07:00
+hash: 82683208caadb0b9ca763e8a3eebd802092ec72b2c3f481dbca3af767d296ab1
+updated: 2017-06-13T11:48:54.232861217+09:00
 imports:
-- name: github.com/bitly/go-nsq
-  version: d71fb89c9e0263aaed89645b0b168e11ccf597b1
+- name: github.com/beorn7/perks
+  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
+  subpackages:
+  - quantile
+- name: github.com/go-kit/kit
+  version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
+  subpackages:
+  - log
+  - metrics
+  - metrics/discard
+  - metrics/dogstatsd
+  - metrics/expvar
+  - metrics/generic
+  - metrics/graphite
+  - metrics/influx
+  - metrics/internal/lv
+  - metrics/internal/ratemap
+  - metrics/prometheus
+  - metrics/provider
+  - metrics/statsd
+  - util/conn
+- name: github.com/go-logfmt/logfmt
+  version: 390ab7935ee28ec6b286364bba9b4dd6410cb3d5
+- name: github.com/go-stack/stack
+  version: 7a2f19628aabfe68f0766b59e74d6315f8347d22
+- name: github.com/golang/protobuf
+  version: 5a0f697c9ed9d68fef0116532c6e05cfeae00e55
+  subpackages:
+  - proto
+  - ptypes/any
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/handlers
+  version: a4d79d4487c2430a17d9dc8a1f74d1a6ed6908ca
 - name: github.com/gorilla/mux
   version: 392c28fe23e1c45ddba891b0320b3b5df220beea
+- name: github.com/hashicorp/consul
+  version: 695fde556f69faac87429d4a8f837724eca3b867
+  subpackages:
+  - api
+- name: github.com/hashicorp/go-cleanhttp
+  version: 3573b8b52aa7b37b9358d966a898feb387f62437
+- name: github.com/hashicorp/go-rootcerts
+  version: 6bb64b370b90e7ef1fa532be9e591a81c3493e00
+- name: github.com/hashicorp/serf
+  version: 781adcfd703795082facaacaf76bbef9b03897d3
+  subpackages:
+  - coordinate
+- name: github.com/influxdata/influxdb
+  version: a7ca7b58e61eb6b7c3bbf1b5e4bab88b8cf82fe9
+  subpackages:
+  - client/v2
+  - models
+  - pkg/escape
+- name: github.com/julienschmidt/httprouter
+  version: 975b5c4c7c21c0e3d2764200bf2aa8e34657ae6e
+- name: github.com/kelseyhightower/envconfig
+  version: 70f0258d44cbaa3b6a2581d82f58da01a38e4de4
+- name: github.com/kr/logfmt
+  version: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
+- name: github.com/matttproud/golang_protobuf_extensions
+  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
+  subpackages:
+  - pbutil
+- name: github.com/mitchellh/go-homedir
+  version: b8bc1bf767474819792c23f32d8286a45736f1c6
 - name: github.com/mreiferson/go-snappystream
   version: 028eae7ab5c4c9e2d1cb4c4ca1e53259bbe7e504
   subpackages:
   - snappy-go
 - name: github.com/nsqio/go-nsq
   version: d71fb89c9e0263aaed89645b0b168e11ccf597b1
+- name: github.com/nu7hatch/gouuid
+  version: 179d4d0c4d8d407a32af483c2354df1d2c91e6c3
+- name: github.com/NYTimes/gizmo
+  version: aa4a7f28c7b03de7f9434245ee9b0b787414b46c
+  subpackages:
+  - config
+  - config/metrics
+  - server
+  - web
+- name: github.com/NYTimes/logrotate
+  version: a5276429b5aadf067486dcb082e41a600c757d2c
+- name: github.com/prometheus/client_golang
+  version: de4d4ffe63b9eff7f27484fdef6e421597e6abb4
+  subpackages:
+  - prometheus
+- name: github.com/prometheus/client_model
+  version: 6f3806018612930941127f2a7c6c453ba2c527d2
+  subpackages:
+  - go
+- name: github.com/prometheus/common
+  version: 13ba4ddd0caa9c28ca7b7bffe1dfa9ed8d5ef207
+  subpackages:
+  - expfmt
+  - internal/bitbucket.org/ww/goautoneg
+  - model
+- name: github.com/prometheus/procfs
+  version: a3bfc74126ea9e45ee5d5c6f7fc86191b7d488fb
+  subpackages:
+  - xfs
 - name: github.com/rs/cors
   version: a62a804a8a009876ca59105f7899938a1349f4b3
-- name: github.com/rs/xhandler
-  version: d9d9599b6aaf6a058cb7b1f48291ded2cbd13390
 - name: github.com/satori/go.uuid
   version: 879c5887cd475cd7864858769793b2ceb0d44feb
 - name: github.com/Sirupsen/logrus
@@ -25,12 +112,57 @@ imports:
   version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
 - name: github.com/urfave/negroni
   version: fde5e16d32adc7ad637e9cd9ad21d4ebc6192535
+- name: github.com/VividCortex/gohistogram
+  version: 51564d9861991fb0ad0f531c99ef602d0f9866e6
 - name: golang.org/x/net
-  version: ffe101cce3477a6c6d8f0754d103bb0a84ec1266
+  version: 1a68b1313cf4ad7778376e82641197b60c02f65c
   subpackages:
   - context
+  - http2
+  - http2/hpack
+  - idna
+  - internal/timeseries
+  - lex/httplex
+  - trace
 - name: golang.org/x/sys
-  version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
+  version: 0b25a408a50076fbbcae6b7ac0ea5fbb0b085e79
   subpackages:
   - unix
+- name: golang.org/x/text
+  version: 210eee5cf7323015d097341bcf7166130d001cd8
+  subpackages:
+  - secure/bidirule
+  - transform
+  - unicode/bidi
+  - unicode/norm
+- name: google.golang.org/appengine
+  version: a2f4131514e563cedfdb6e7d267df9ad48591e93
+  subpackages:
+  - internal
+  - internal/app_identity
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/modules
+  - internal/remote_api
+- name: google.golang.org/genproto
+  version: aa2eb687b4d3e17154372564ad8d6bf11c3cf21f
+  subpackages:
+  - googleapis/rpc/status
+- name: google.golang.org/grpc
+  version: a94a7ac054dc76e5ab6cf170a9d82faba8aaf33f
+  subpackages:
+  - codes
+  - credentials
+  - grpclb/grpc_lb_v1
+  - grpclog
+  - internal
+  - keepalive
+  - metadata
+  - naming
+  - peer
+  - stats
+  - status
+  - tap
+  - transport
 testImports: []
